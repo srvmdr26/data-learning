@@ -10,13 +10,15 @@ engine = create_engine(
 
 data = {
     "first_name": [
-        "Emma", "Liam", "Olivia", "Noah", "Ava",
-        "Ethan", "Mia", "Lucas", "Isabella", "James"
-    ],
+    "Emma", "Liam", "Olivia", "Noah", "Ava",
+    "Ethan", "Mia", "Lucas", "Isabella", "James",
+    "Sophia"
+],
     "last_name": [
-        "Clark", "Walker", "Hall", "Young", "King",
-        "Wright", "Lopez", "Hill", "Green", "Adams"
-    ],
+    "Clark", "Walker", "Hall", "Young", "King",
+    "Wright", "Lopez", "Hill", "Green", "Adams",
+    "Martinez"
+],
     "email": [
         "emma@example.com",
         "liam@example.com",
@@ -27,21 +29,22 @@ data = {
         "mia@example.com",
         "lucas@example.com",
         "isabella@example.com",
-        "james@example.com"
+        "james@example.com",
+"sophia@example.com"
     ],
     "city": [
         "Dallas", "Austin", "Chicago", "Dallas", "Seattle",
-        "Denver", "Austin", "Fort Worth", "Chicago", "Dallas"
+        "Denver", "Austin", "Fort Worth", "Chicago", "Dallas", "Dallas"
     ],
     "state": [
         "TX", "TX", "IL", "TX", "WA",
-        "CO", "TX", "TX", "IL", "TX"
+        "CO", "TX", "TX", "IL", "TX", "TX"
     ],
     "signup_date": [
         "2026-05-10", "2026-05-12", "2026-05-15",
         "2026-05-18", "2026-05-20", "2026-05-22",
         "2026-05-25", "2026-05-27", "2026-05-29",
-        "2026-06-01"
+        "2026-06-01", "2026-06-05"
     ]
 }
 
@@ -49,11 +52,23 @@ df = pd.DataFrame(data)
 
 df["signup_date"] = pd.to_datetime(df["signup_date"])
 
-df.to_sql(
+# Read emails already stored in PostgreSQL
+existing = pd.read_sql(
+    "SELECT email FROM customers_python",
+    engine
+)
+
+# Keep only customers that are not already in the database
+df_new = df[~df["email"].isin(existing["email"])]
+
+print(f"New rows to insert: {len(df_new)}")
+
+# Insert only the new customers
+df_new.to_sql(
     "customers_python",
     engine,
-    if_exists="replace",
+    if_exists="append",
     index=False
 )
 
-print(f"Successfully loaded {len(df)} rows into PostgreSQL.")
+print(f"Successfully loaded {len(df_new)} new rows into PostgreSQL.")
