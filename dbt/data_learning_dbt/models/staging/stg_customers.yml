@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Cleaned customer data from the raw customers table"
+
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+
+      - name: email
+        tests:
+          - unique
+          - not_null
+
+      - name: signup_date
+        tests:
+          - not_null

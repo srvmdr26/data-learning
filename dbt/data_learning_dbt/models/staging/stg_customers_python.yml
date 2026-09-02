@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_customers_python
+    description: "Staging model for customer data loaded through Python"
+
+    columns:
+      - name: email
+        tests:
+          - not_null
+          - unique
+
+      - name: signup_date
+        tests:
+          - not_null
